@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Note-Taking and Summarization Tool</title>
+</head>
+<body>
+    <h1>Digital Note-Taking and Summarization Tool</h1>
+    <form id="summarizeForm" enctype="multipart/form-data">
+        <label for="input_type">Input Type:</label>
+        <select name="input_type" id="input_type">
+            <option value="text">Text</option>
+            <option value="audio">Audio</option>
+        </select>
+        <div id="textInput">
+            <textarea name="text" id="text" rows="10" cols="50"></textarea>
+        </div>
+        <div id="audioInput" style="display:none;">
+            <input type="file" name="audio" id="audio">
+        </div>
+        <label for="max_length">Max Summary Length:</label>
+        <input type="number" name="max_length" id="max_length" value="150">
+        <label for="min_length">Min Summary Length:</label>
+        <input type="number" name="min_length" id="min_length" value="30">
+        <button type="submit">Summarize</button>
+    </form>
+    <div id="output" style="display:none;">
+        <h2>Summary</h2>
+        <p id="summary"></p>
+        <h2>Keywords</h2>
+        <p id="keywords"></p>
+        <button id="download">Download</button>
+        <button id="copy">Copy</button>
+    </div>
+    <script>
+        document.getElementById('input_type').addEventListener('change', function() {
+            if (this.value === 'text') {
+                document.getElementById('textInput').style.display = 'block';
+                document.getElementById('audioInput').style.display = 'none';
+            } else {
+                document.getElementById('textInput').style.display = 'none';
+                document.getElementById('audioInput').style.display = 'block';
+            }
+        });
+
+        document.getElementById('summarizeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch('/summarize', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('summary').innerText = data.summary;
+                document.getElementById('keywords').innerText = data.keywords.join(', ');
+                document.getElementById('output').style.display = 'block';
+            });
+        });
+
+        document.getElementById('download').addEventListener('click', function() {
+            const summaryText = document.getElementById('summary').innerText;
+            const blob = new Blob([summaryText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'summary.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('copy').addEventListener('click', function() {
+            const summaryText = document.getElementById('summary').innerText;
+            navigator.clipboard.writeText(summaryText);
+            alert('Summary copied to clipboard!');
+        });
+    </script>
+</body>
+</html>
