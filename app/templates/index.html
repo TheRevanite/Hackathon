@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Digital Note-Taking and Summarization Tool</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <h1>Digital Note-Taking and Summarization Tool</h1>
@@ -33,48 +34,6 @@
         <button id="download">Download</button>
         <button id="copy">Copy</button>
     </div>
-    <script>
-        document.getElementById('input_type').addEventListener('change', function() {
-            if (this.value === 'text') {
-                document.getElementById('textInput').style.display = 'block';
-                document.getElementById('audioInput').style.display = 'none';
-            } else {
-                document.getElementById('textInput').style.display = 'none';
-                document.getElementById('audioInput').style.display = 'block';
-            }
-        });
-
-        document.getElementById('summarizeForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            fetch('/summarize', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('summary').innerText = data.summary;
-                document.getElementById('keywords').innerText = data.keywords.join(', ');
-                document.getElementById('output').style.display = 'block';
-            });
-        });
-
-        document.getElementById('download').addEventListener('click', function() {
-            const summaryText = document.getElementById('summary').innerText;
-            const blob = new Blob([summaryText], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'summary.txt';
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-
-        document.getElementById('copy').addEventListener('click', function() {
-            const summaryText = document.getElementById('summary').innerText;
-            navigator.clipboard.writeText(summaryText);
-            alert('Summary copied to clipboard!');
-        });
-    </script>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </body>
 </html>
