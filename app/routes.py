@@ -7,7 +7,7 @@ import speech_recognition as sr
 import spacy
 
 # Load NLP models
-summarizer = pipeline("summarization")
+summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 nlp = spacy.load("en_core_web_sm")
 
 def extract_keywords(text):
@@ -43,6 +43,9 @@ def summarize():
         text = request.form.get('text')
     elif input_type == 'audio':
         audio_file = request.files['audio']
+        # Ensure the uploads directory exists
+        if not os.path.exists('uploads'):
+            os.makedirs('uploads')
         audio_file_path = os.path.join("uploads", audio_file.filename)
         audio_file.save(audio_file_path)
         text = audio_to_text(audio_file_path)
